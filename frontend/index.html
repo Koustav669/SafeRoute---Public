@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafePath: Women's Safety Navigation</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <h1>SafePath 🌙</h1>
+            <button id="sos-btn">SOS</button>
+        </header>
+
+        <div class="controls">
+            <input type="text" id="start-input" placeholder="Enter starting point">
+            <input type="text" id="end-input" placeholder="Enter destination">
+            <button id="find-route-btn">Find Safe Route</button>
+        </div>
+
+        <div id="ai-insight" class="hidden">
+            <h3>✨ Gemini Safety Analysis</h3>
+            <p id="ai-text">Analyzing route environment...</p>
+            <div id="safety-score">Score: --/10</div>
+        </div>
+
+        <div id="map"></div>
+
+        <button id="report-btn" class="fab">+</button>
+    </div>
+
+    <div id="report-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Report Safety Issue</h3>
+            <p>What is the concern at this location?</p>
+            <select id="issue-type">
+                <option value="poor_lighting">💡 Poor Lighting</option>
+                <option value="harassment">⚠️ Harassment / Catcalling</option>
+                <option value="deserted">👣 Deserted / Isolated Area</option>
+                <option value="blocked">🚫 Path Blocked / Under Construction</option>
+            </select>
+            <div class="modal-buttons">
+                <button id="submit-report">Submit Report</button>
+                <button id="close-modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+
+    <script async
+        src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places,geometry&callback=initMap">
+    </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+# Exclude frontend directory from Vite processing
+frontend/**
+public/**/*.html
+examples/**/*.html
+node_modules/
+.git/
+.history/

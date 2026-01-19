@@ -1,0 +1,66 @@
+.register-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: auto;
+  width: 520px;
+  padding: 40px 20px;
+  border-radius: 10px;
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.register-form .form-title {
+  font-size: 20px;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.register-form .inputbox {
+  position: relative;
+  margin: 10px 0;
+  width: 100%;
+}
+
+.register-form .inputbox input {
+  height: 50px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 40px;
+  font-size: 16px;
+  color: white;
+  padding: 20px 45px 20px 20px;
+}
+
+.register-form .inputbox input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.register-form .inputbox i {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.register-form .login-link {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.register-form .login-link a {
+  color: white;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.register-form .login-link a:hover {
+  color: #00FFFF;
+}

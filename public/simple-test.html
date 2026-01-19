@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Simple Google Maps Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #0B1C2D;
+      color: white;
+    }
+    #map {
+      height: 500px;
+      width: 100%;
+      margin: 20px 0;
+      border: 2px solid #2EC4B6;
+      border-radius: 8px;
+    }
+    .error {
+      background: #E63946;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .success {
+      background: #2EC4B6;
+      color: #0B1C2D;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .info {
+      background: #12263A;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+    code {
+      background: #0B1C2D;
+      padding: 3px 8px;
+      border-radius: 4px;
+      color: #2EC4B6;
+    }
+  </style>
+</head>
+<body>
+  <h1>🗺️ Google Maps API Key Test</h1>
+  
+  <div class="info">
+    <h3>Testing API Key:</h3>
+    <code>AIzaSyCo3cnR4Yk0cx4yHqK2_T699cZmsc_TRGg</code>
+  </div>
+
+  <div id="status">
+    <div class="info">⏳ Loading Google Maps...</div>
+  </div>
+
+  <div id="map"></div>
+
+  <div id="console-output" class="info">
+    <h3>Console Output:</h3>
+    <div id="logs"></div>
+  </div>
+
+  <script>
+    const API_KEY = 'AIzaSyCo3cnR4Yk0cx4yHqK2_T699cZmsc_TRGg';
+    const statusDiv = document.getElementById('status');
+    const logsDiv = document.getElementById('logs');
+
+    function log(message, type = 'info') {
+      const p = document.createElement('p');
+      p.textContent = `[${type.toUpperCase()}] ${message}`;
+      p.style.margin = '5px 0';
+      p.style.color = type === 'error' ? '#E63946' : type === 'success' ? '#2EC4B6' : 'white';
+      logsDiv.appendChild(p);
+      console.log(`[${type}]`, message);
+    }
+
+    // Override console methods to capture output
+    const originalError = console.error;
+    console.error = function(...args) {
+      log(args.join(' '), 'error');
+      originalError.apply(console, args);
+    };
+
+    window.initMap = function() {
+      log('✅ Google Maps script loaded successfully!', 'success');
+      statusDiv.innerHTML = '<div class="success">✅ Google Maps loaded successfully!</div>';
+      
+      try {
+        const map = new google.maps.Map(document.getElementById('map'), {
+          center: { lat: 40.7128, lng: -74.0060 },
+          zoom: 12,
+          styles: [
+            { elementType: 'geometry', stylers: [{ color: '#12263A' }] },
+            { elementType: 'labels.text.stroke', stylers: [{ color: '#0B1C2D' }] },
+            { elementType: 'labels.text.fill', stylers: [{ color: '#8B9DC3' }] }
+          ]
+        });
+        
+        new google.maps.Marker({
+          position: { lat: 40.7128, lng: -74.0060 },
+          map: map,
+          title: 'New York City'
+        });
+        
+        log('✅ Map initialized and marker added!', 'success');
+      } catch (error) {
+        log('❌ Error initializing map: ' + error.message, 'error');
+        statusDiv.innerHTML = '<div class="error">❌ Error: ' + error.message + '</div>';
+      }
+    };
+
+    window.gm_authFailure = function() {
+      log('❌ Google Maps Authentication Failed!', 'error');
+      statusDiv.innerHTML = `
+        <div class="error">
+          <h3>❌ Authentication Failed</h3>
+          <p>The API key is invalid or doesn't have the required permissions.</p>
+          <h4>Common causes:</h4>
+          <ul>
+            <li>API key is invalid or expired</li>
+            <li>Maps JavaScript API is not enabled</li>
+            <li>Billing is not enabled on the Google Cloud project</li>
+            <li>API key has restrictions that block this domain</li>
+          </ul>
+          <h4>How to fix:</h4>
+          <ol>
+            <li>Go to <a href="https://console.cloud.google.com/" target="_blank" style="color: #2EC4B6;">Google Cloud Console</a></li>
+            <li>Enable billing on your project</li>
+            <li>Enable "Maps JavaScript API" in APIs & Services > Library</li>
+            <li>Check API key restrictions in APIs & Services > Credentials</li>
+          </ol>
+        </div>
+      `;
+    };
+
+    log('Loading Google Maps script...', 'info');
+    log('API Key: ' + API_KEY.substring(0, 20) + '...', 'info');
+
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&callback=initMap`;
+    script.async = true;
+    script.defer = true;
+    
+    script.onerror = function(error) {
+      log('❌ Failed to load Google Maps script!', 'error');
+      log('This usually means a network error or the script URL is blocked', 'error');
+      statusDiv.innerHTML = `
+        <div class="error">
+          <h3>❌ Script Loading Failed</h3>
+          <p>Could not load the Google Maps JavaScript file.</p>
+          <h4>Possible causes:</h4>
+          <ul>
+            <li>No internet connection</li>
+            <li>Firewall or ad blocker blocking Google Maps</li>
+            <li>VPN or proxy interfering</li>
+            <li>Browser extension blocking the script</li>
+          </ul>
+          <h4>Try:</h4>
+          <ul>
+            <li>Disable ad blockers</li>
+            <li>Try in incognito mode</li>
+            <li>Check your internet connection</li>
+          </ul>
+        </div>
+      `;
+    };
+    
+    document.head.appendChild(script);
+    log('Script tag added to page', 'info');
+  </script>
+</body>
+</html>

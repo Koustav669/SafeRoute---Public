@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Maps API Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #0B1C2D;
+      color: #fff;
+    }
+    h1 {
+      color: #2EC4B6;
+    }
+    #map {
+      height: 400px;
+      width: 100%;
+      margin: 20px 0;
+      background: #12263A;
+      border-radius: 8px;
+    }
+    .status {
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      background: #12263A;
+    }
+    .success {
+      border-left: 4px solid #2EC4B6;
+    }
+    .error {
+      border-left: 4px solid #E63946;
+    }
+    .warning {
+      border-left: 4px solid #F4D35E;
+    }
+    .info {
+      background: #1a3a52;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    code {
+      background: #0B1C2D;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #2EC4B6;
+    }
+    button {
+      background: #2EC4B6;
+      color: #0B1C2D;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      margin: 5px;
+    }
+    button:hover {
+      background: #26a89a;
+    }
+  </style>
+</head>
+<body>
+  <h1>🗺️ Google Maps API Diagnostic Tool</h1>
+  
+  <div class="info">
+    <h3>Testing API Key:</h3>
+    <code id="apiKey">Loading...</code>
+  </div>
+
+  <div id="status"></div>
+
+  <h2>Map Test</h2>
+  <div id="map"></div>
+
+  <div class="info">
+    <h3>Test Actions:</h3>
+    <button onclick="testGeocoding()">Test Geocoding</button>
+    <button onclick="testDirections()">Test Directions</button>
+    <button onclick="testPlaces()">Test Places</button>
+  </div>
+
+  <div id="results"></div>
+
+  <script>
+    // Replace with your API key
+    const API_KEY = 'AIzaSyCo3cnR4Yk0cx4yHqK2_T699cZmsc_TRGg';
+    
+    document.getElementById('apiKey').textContent = API_KEY;
+
+    let map;
+    let statusDiv = document.getElementById('status');
+    let resultsDiv = document.getElementById('results');
+
+    function addStatus(message, type = 'info') {
+      const div = document.createElement('div');
+      div.className = `status ${type}`;
+      div.innerHTML = `<strong>${type.toUpperCase()}:</strong> ${message}`;
+      statusDiv.appendChild(div);
+      console.log(`[${type}]`, message);
+    }
+
+    function addResult(title, message, type = 'info') {
+      const div = document.createElement('div');
+      div.className = `status ${type}`;
+      div.innerHTML = `<strong>${title}:</strong> ${message}`;
+      resultsDiv.appendChild(div);
+    }
+
+    // Test 1: Load Google Maps Script
+    addStatus('Loading Google Maps JavaScript API...', 'info');
+
+    window.initMap = function() {
+      addStatus('✅ Google Maps script loaded successfully!', 'success');
+      
+      try {
+        // Test 2: Initialize Map
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: { lat: 40.7128, lng: -74.0060 }, // New York City
+          zoom: 12,
+          styles: [
+            { elementType: 'geometry', stylers: [{ color: '#12263A' }] },
+            { elementType: 'labels.text.stroke', stylers: [{ color: '#0B1C2D' }] },
+            { elementType: 'labels.text.fill', stylers: [{ color: '#8B9DC3' }] }
+          ]
+        });
+        
+        addStatus('✅ Map initialized successfully!', 'success');
+        
+        // Add a marker
+        new google.maps.Marker({
+          position: { lat: 40.7128, lng: -74.0060 },
+          map: map,
+          title: 'New York City'
+        });
+        
+        addStatus('✅ Marker added successfully!', 'success');
+        
+      } catch (error) {
+        addStatus(`❌ Error initializing map: ${error.message}`, 'error');
+      }
+    };
+
+    // Load the script
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=places,geometry&callback=initMap`;
+    script.async = true;
+    script.defer = true;
+    
+    script.onerror = function(error) {
+      addStatus('❌ Failed to load Google Maps script!', 'error');
+      addStatus('Possible reasons:', 'warning');
+      addStatus('1. Invalid API key', 'warning');
+      addStatus('2. Maps JavaScript API not enabled in Google Cloud Console', 'warning');
+      addStatus('3. Billing not enabled on your Google Cloud project', 'warning');
+      addStatus('4. Network/firewall blocking the request', 'warning');
+      addStatus('5. API key restrictions (HTTP referrer, IP address)', 'warning');
+    };
+    
+    document.head.appendChild(script);
+
+    // Test Functions
+    function testGeocoding() {
+      if (!google || !google.maps) {
+        addResult('Geocoding Test', '❌ Google Maps not loaded', 'error');
+        return;
+      }
+
+      addResult('Geocoding Test', 'Testing...', 'info');
+      
+      const geocoder = new google.maps.Geocoder();
+      geocoder.geocode({ address: 'Times Square, New York, NY' }, (results, status) => {
+        if (status === 'OK') {
+          addResult('Geocoding Test', `✅ Success! Location: ${results[0].formatted_address}`, 'success');
+          map.setCenter(results[0].geometry.location);
+          new google.maps.Marker({
+            map: map,
+            position: results[0].geometry.location
+          });
+        } else {
+          addResult('Geocoding Test', `❌ Failed: ${status}`, 'error');
+        }
+      });
+    }
+
+    function testDirections() {
+      if (!google || !google.maps) {
+        addResult('Directions Test', '❌ Google Maps not loaded', 'error');
+        return;
+      }
+
+      addResult('Directions Test', 'Testing...', 'info');
+      
+      const directionsService = new google.maps.DirectionsService();
+      directionsService.route({
+        origin: 'Times Square, New York, NY',
+        destination: 'Central Park, New York, NY',
+        travelMode: google.maps.TravelMode.WALKING,
+        provideRouteAlternatives: true
+      }, (result, status) => {
+        if (status === 'OK') {
+          addResult('Directions Test', `✅ Success! Found ${result.routes.length} route(s)`, 'success');
+          
+          // Display the route
+          const directionsRenderer = new google.maps.DirectionsRenderer({
+            map: map,
+            directions: result
+          });
+        } else {
+          addResult('Directions Test', `❌ Failed: ${status}`, 'error');
+          if (status === 'REQUEST_DENIED') {
+            addResult('Directions API', '⚠️ Directions API may not be enabled in Google Cloud Console', 'warning');
+          }
+        }
+      });
+    }
+
+    function testPlaces() {
+      if (!google || !google.maps || !google.maps.places) {
+        addResult('Places Test', '❌ Google Maps Places library not loaded', 'error');
+        return;
+      }
+
+      addResult('Places Test', 'Testing...', 'info');
+      
+      const service = new google.maps.places.PlacesService(map);
+      service.nearbySearch({
+        location: { lat: 40.7128, lng: -74.0060 },
+        radius: 500,
+        type: 'restaurant'
+      }, (results, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+          addResult('Places Test', `✅ Success! Found ${results.length} place(s)`, 'success');
+        } else {
+          addResult('Places Test', `❌ Failed: ${status}`, 'error');
+          if (status === 'REQUEST_DENIED') {
+            addResult('Places API', '⚠️ Places API may not be enabled in Google Cloud Console', 'warning');
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
