@@ -32,6 +32,8 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { NavigationDialog } from '@/components/NavigationDialog';
 import { MockMap } from '@/components/MockMap';
+import { LocationAutocomplete } from '@/components/LocationAutocomplete';
+import { countryCodes } from '@/data/countryCodes';
 
 // ============== SOS FEATURE TYPES AND CONSTANTS ==============
 type SosSettings = {
@@ -1117,12 +1119,12 @@ export default function SafeRoute() {
                   Start Location
                 </Label>
                 <div className="flex gap-2">
-                  <Input
-                    id="start"
+                  <LocationAutocomplete
                     value={startLocation}
-                    onChange={(e) => setStartLocation(e.target.value)}
+                    onChange={setStartLocation}
+                    onSelect={(loc) => setStartLocation(loc.address)}
                     placeholder="Your current location"
-                    className="bg-input border-border text-sm xl:text-base flex-1"
+                    className="flex-1"
                   />
                   <Button
                     type="button"
@@ -1146,12 +1148,11 @@ export default function SafeRoute() {
                   <MapPin className="w-4 h-4" />
                   Destination
                 </Label>
-                <Input
-                  id="destination"
+                <LocationAutocomplete
                   value={destination}
-                  onChange={(e) => setDestination(e.target.value)}
+                  onChange={setDestination}
+                  onSelect={(loc) => setDestination(loc.address)}
                   placeholder="Enter destination"
-                  className="bg-input border-border text-sm xl:text-base"
                 />
               </div>
 
@@ -2337,25 +2338,41 @@ export default function SafeRoute() {
                   code = '91';
                   number = fullValue.slice(2);
                 } else if (fullValue.length > 0 && !fullValue.startsWith('91')) {
-                  // If it doesn't start with 91, keep it all in number for safety, defaulting code to 91
-                  number = fullValue;
+                  // Try to match known country codes
+                  const matchedCode = countryCodes.find(c => fullValue.startsWith(c.code));
+                  if (matchedCode) {
+                    code = matchedCode.code;
+                    number = fullValue.slice(matchedCode.code.length);
+                  } else {
+                    number = fullValue;
+                  }
                 }
 
                 return (
                   <div className="space-y-1">
                     {label && <Label>{label}</Label>}
                     <div className="flex gap-2">
-                      {/* Country Code */}
-                      <div className="w-20 flex-shrink-0">
-                        <Input
+                      {/* Country Code Dropdown */}
+                      <div className="w-28 flex-shrink-0">
+                        <Select
                           value={code}
-                          onChange={(e) => {
-                            const newCode = e.target.value.replace(/\D/g, '');
+                          onValueChange={(newCode) => {
                             handleSosSettingsChange(field, newCode + number);
                           }}
-                          placeholder="Code"
-                          className="text-center"
-                        />
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue>
+                              {countryCodes.find(c => c.code === code)?.flag || '🌍'} +{code}
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent className="max-h-60">
+                            {countryCodes.map((country) => (
+                              <SelectItem key={country.iso} value={country.code}>
+                                {country.flag} {country.name} (+{country.code})
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                       {/* Phone Number */}
                       <div className="flex-1">
@@ -2363,7 +2380,7 @@ export default function SafeRoute() {
                           value={number}
                           onChange={(e) => {
                             const newNumber = e.target.value.replace(/\D/g, '');
-                            handleSosSettingsChange(field, code + newNumber); // Always unite with current/default code
+                            handleSosSettingsChange(field, code + newNumber);
                           }}
                           placeholder={placeholder}
                         />
