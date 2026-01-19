@@ -2375,8 +2375,23 @@ export default function SafeRoute() {
 
               return (
                 <>
-                  {renderPhoneInput('Police phone number', 'police', 'e.g. 100')}
-                  {renderPhoneInput('Ambulance phone number', 'ambulance', 'e.g. 102')}
+                  {/* Police & Ambulance - No country code needed */}
+                  <div className="space-y-1">
+                    <Label>Police phone number</Label>
+                    <Input
+                      value={sosSettings.police || ''}
+                      onChange={(e) => handleSosSettingsChange('police', e.target.value.replace(/\D/g, ''))}
+                      placeholder="e.g. 100"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Ambulance phone number</Label>
+                    <Input
+                      value={sosSettings.ambulance || ''}
+                      onChange={(e) => handleSosSettingsChange('ambulance', e.target.value.replace(/\D/g, ''))}
+                      placeholder="e.g. 102"
+                    />
+                  </div>
 
                   <div className="space-y-3 p-3 bg-muted/50 rounded-lg">
                     <div className="font-medium text-sm">Emergency WhatsApp Numbers</div>
