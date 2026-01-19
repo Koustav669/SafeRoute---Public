@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Shield, MapPin, Clock, AlertCircle, Users, Sparkles, Loader2, Navigation, Car, Bike, Bus, Footprints, CheckCircle2, XCircle, MapPinned, Eye, Star, Send, Heart } from 'lucide-react';
+import { Shield, MapPin, Clock, AlertCircle, Users, Sparkles, Loader2, Navigation, Car, Bike, Bus, Footprints, CheckCircle2, XCircle, MapPinned, Eye, Star, Send, Heart, ChevronDown } from 'lucide-react';
 import { StarRating, SafetyScoreSlider } from '@/components/StarRating';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { googleMapsService, type RouteData, type TravelMode } from '@/services/googleMaps';
 import { mockGoogleMapsService, type MockRouteData } from '@/services/mockGoogleMaps';
 import { geminiService, type SafetyAnalysis } from '@/services/gemini';
@@ -1402,70 +1403,78 @@ export default function SafeRoute() {
                         </p>
                       </div>
 
-                      {/* Individual Factor Breakdown */}
-                      <h4 className="font-medium text-sm xl:text-base flex items-center gap-2 pt-2">
-                        <AlertCircle className="w-4 h-4 text-muted-foreground" />
-                        Factor-by-Factor Breakdown
-                      </h4>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {factors.map((factor) => {
-                          const percentage = (factor.points / factor.weight) * 100;
-                          const colorClass = percentage >= 70 ? 'text-green-400' : percentage >= 40 ? 'text-yellow-400' : 'text-red-400';
-                          const bgColorClass = percentage >= 70 ? 'bg-green-500' : percentage >= 40 ? 'bg-yellow-500' : 'bg-red-500';
-
-                          return (
-                            <div key={factor.name} className="bg-secondary/50 rounded-lg p-3">
-                              <div className="flex justify-between items-center mb-2">
-                                <span className="text-xs xl:text-sm font-medium">
-                                  {factor.emoji} {factor.name}
-                                </span>
-                                <div className="text-right">
-                                  <span className={`text-sm xl:text-base font-bold ${colorClass}`}>
-                                    {factor.points}/{factor.weight}
-                                  </span>
-                                  <span className="text-xs text-muted-foreground ml-1">pts</span>
-                                </div>
-                              </div>
-
-                              {/* Progress bar */}
-                              <div className="w-full bg-gray-700 rounded-full h-2.5 mb-2">
-                                <div
-                                  className={`h-2.5 rounded-full ${bgColorClass} transition-all`}
-                                  style={{ width: `${percentage}%` }}
-                                />
-                              </div>
-
-                              {/* Description and weight info */}
-                              <div className="flex justify-between items-center">
-                                <span className="text-xs text-muted-foreground">
-                                  {factor.description}
-                                </span>
-                                <span className="text-xs text-muted-foreground">
-                                  Weight: {factor.weight}%
-                                </span>
-                              </div>
+                      {/* Individual Factor Breakdown - Collapsible */}
+                      <Collapsible>
+                        <CollapsibleTrigger className="w-full">
+                          <div className="font-medium text-sm xl:text-base flex items-center justify-between gap-2 pt-2 cursor-pointer hover:text-primary transition-colors">
+                            <div className="flex items-center gap-2">
+                              <AlertCircle className="w-4 h-4 text-muted-foreground" />
+                              Factor-by-Factor Breakdown
                             </div>
-                          );
-                        })}
-                      </div>
+                            <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform" />
+                          </div>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="pt-3">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {factors.map((factor) => {
+                              const percentage = (factor.points / factor.weight) * 100;
+                              const colorClass = percentage >= 70 ? 'text-green-400' : percentage >= 40 ? 'text-yellow-400' : 'text-red-400';
+                              const bgColorClass = percentage >= 70 ? 'bg-green-500' : percentage >= 40 ? 'bg-yellow-500' : 'bg-red-500';
 
-                      {/* Color Legend */}
-                      <div className="flex flex-wrap items-center gap-4 pt-2 text-xs">
-                        <span className="text-muted-foreground font-medium">Score Guide:</span>
-                        <div className="flex items-center gap-1.5">
-                          <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                          <span className="text-muted-foreground">70%+ of max points (Good)</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                          <span className="text-muted-foreground">40-69% (Moderate)</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                          <span className="text-muted-foreground">&lt;40% (Needs attention)</span>
-                        </div>
-                      </div>
+                              return (
+                                <div key={factor.name} className="bg-secondary/50 rounded-lg p-3">
+                                  <div className="flex justify-between items-center mb-2">
+                                    <span className="text-xs xl:text-sm font-medium">
+                                      {factor.emoji} {factor.name}
+                                    </span>
+                                    <div className="text-right">
+                                      <span className={`text-sm xl:text-base font-bold ${colorClass}`}>
+                                        {factor.points}/{factor.weight}
+                                      </span>
+                                      <span className="text-xs text-muted-foreground ml-1">pts</span>
+                                    </div>
+                                  </div>
+
+                                  {/* Progress bar */}
+                                  <div className="w-full bg-gray-700 rounded-full h-2.5 mb-2">
+                                    <div
+                                      className={`h-2.5 rounded-full ${bgColorClass} transition-all`}
+                                      style={{ width: `${percentage}%` }}
+                                    />
+                                  </div>
+
+                                  {/* Description and weight info */}
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-xs text-muted-foreground">
+                                      {factor.description}
+                                    </span>
+                                    <span className="text-xs text-muted-foreground">
+                                      Weight: {factor.weight}%
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Color Legend */}
+                          <div className="flex flex-wrap items-center gap-4 pt-2 text-xs">
+                            <span className="text-muted-foreground font-medium">Score Guide:</span>
+                            <div className="flex items-center gap-1.5">
+                              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                              <span className="text-muted-foreground">70%+ of max points (Good)</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                              <span className="text-muted-foreground">40-69% (Moderate)</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                              <span className="text-muted-foreground">&lt;40% (Needs attention)</span>
+                            </div>
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
                     </div>
                   );
                 })()}
